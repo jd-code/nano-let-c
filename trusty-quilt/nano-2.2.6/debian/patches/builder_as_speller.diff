@@ -1,0 +1,72 @@
+Description: Extend speller hook for building with crafted build scripts
+ the external speller hook process checks for some special tags at the end
+ of the temporary spell-checked file, qnd may jump the cursor to appropriate
+ position and display a matching error or warning message
+Author: jd@disjunkt.com
+Origin: other
+Last-Update: 2014-05-18
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/src/text.c
++++ b/src/text.c
+@@ -2814,6 +2814,33 @@ const char *do_alt_speller(char *tempfil
+ 	char *alt_spell_error;
+ 	char *invoke_error = _("Error invoking \"%s\"");
+ 
++       /***** some JDisms !!! *********************************************/
++       {
++           FILE * f = fopen (tempfile_name, "r");
++           if (f != NULL) {
++               if (fseek (f, -8, SEEK_END) == 0) {
++                   char buf[10];
++                   int size = fread(buf, 8, 1, f);
++                   buf[8] = 0;
++                   if (strcmp (buf, "pureMGIK") == 0) {
++                       if (fseek (f, -4008, SEEK_END) == 0) {
++                           char buf[4096];
++                           int size = fread (buf, 4000, 1, f);
++                           buf[4000] = 0;
++                           char *p = strstr (buf,"MGIKend_");
++                           if (p != NULL) {
++                               *p = 0;
++                               alt_spell_error =
++                                   charalloc(strlen(buf) + 1);
++                               sprintf (alt_spell_error, "%s", buf);
++                               return alt_spell_error;
++                           }
++                       }
++                   }
++               }
++           }
++       }
++
+ #ifndef NANO_TINY
+ 	/* Turn the mark back on if it was on before. */
+ 	openfile->mark_set = old_mark_set;
+@@ -2955,12 +2982,26 @@ void do_spell(void)
+     total_refresh();
+ 
+     if (spell_msg != NULL) {
++      /****** some JDisms added here !!! *********************/
++      if (strncmp ("gotoMGIK", spell_msg, 8) == 0) {
++       int newlineno = atoi (spell_msg+8);
++       char *p = NULL;
++       if (newlineno != 0) {
++           do_gotolinecolumn(newlineno, 1, FALSE, FALSE, FALSE, FALSE);
++       }
++       p = strchr (spell_msg+8, ':');
++       if (p != NULL)
++           statusbar(_("%s"), p+1);
++       else
++           statusbar(_("%s"), spell_msg+8);
++      } else {
+ 	if (errno == 0)
+ 	    /* Don't display an error message of "Success". */
+ 	    statusbar(_("Spell checking failed: %s"), spell_msg);
+ 	else
+ 	    statusbar(_("Spell checking failed: %s: %s"), spell_msg,
+ 		strerror(errno));
++      }
+     } else
+ 	statusbar(_("Finished checking spelling"));
+ }

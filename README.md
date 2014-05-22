@@ -7,3 +7,6 @@ and jump the cursor to first of the compile errors reported by the build
 # Content #
 this repository mirrors git://repoz.nekodune.net/nano-cfacil.git
 it contains a set of derivated packages for debian-inherited distros
+
+### License ###
+nano-cfacil is really just a patch, nano license is GPLv3

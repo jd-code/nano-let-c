@@ -1,0 +1,87 @@
+Description: Upstream changes introduced in version 2.2.2-1ubuntu2letc1lucid
+ This patch has been created by dpkg-source during the package build.
+ Here's the last changelog entry, hopefully it gives details on why
+ those changes were made:
+ .
+ nano (2.2.2-1ubuntu2letc1lucid) lucid; urgency=medium
+ .
+   * extended external-speller hook for crafted build suites
+ .
+ The person named in the Author field signed this changelog entry.
+Author: Pauget Jean-Daniel <pauget@nekodune.com>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- nano-2.2.2.orig/src/text.c
++++ nano-2.2.2/src/text.c
+@@ -2809,6 +2809,33 @@ const char *do_alt_speller(char *tempfil
+ 	char *alt_spell_error;
+ 	char *invoke_error = _("Error invoking \"%s\"");
+ 
++        /***** some JDisms !!! *********************************************/
++        {
++            FILE * f = fopen (tempfile_name, "r");
++            if (f != NULL) {
++                if (fseek (f, -8, SEEK_END) == 0) {
++                    char buf[10];
++                    int size = fread(buf, 8, 1, f);
++                    buf[8] = 0;
++                    if (strcmp (buf, "pureMGIK") == 0) {
++                        if (fseek (f, -4008, SEEK_END) == 0) {
++                            char buf[4096];
++                            int size = fread (buf, 4000, 1, f);
++                            buf[4000] = 0;
++                            char *p = strstr (buf,"MGIKend_");
++                            if (p != NULL) {
++                                *p = 0;
++                                alt_spell_error =
++                                    charalloc(strlen(buf) + 1);
++                                sprintf (alt_spell_error, "%s", buf);
++                                return alt_spell_error;
++                            }
++                        }
++                    }
++                }
++            }
++        }
++
+ #ifndef NANO_TINY
+ 	/* Turn the mark back on if it was on before. */
+ 	openfile->mark_set = old_mark_set;
+@@ -2945,12 +2972,26 @@ void do_spell(void)
+     total_refresh();
+ 
+     if (spell_msg != NULL) {
++      /****** some JDisms added here !!! *********************/
++      if (strncmp ("gotoMGIK", spell_msg, 8) == 0) {
++       int newlineno = atoi (spell_msg+8);
++       char *p = NULL;
++       if (newlineno != 0) {
++           do_gotolinecolumn(newlineno, 1, FALSE, FALSE, FALSE, FALSE);
++       }
++       p = strchr (spell_msg+8, ':');
++       if (p != NULL)
++           statusbar(_("%s"), p+1);
++       else
++           statusbar(_("%s"), spell_msg+8);
++      } else {
+ 	if (errno == 0)
+ 	    /* Don't display an error message of "Success". */
+ 	    statusbar(_("Spell checking failed: %s"), spell_msg);
+ 	else
+ 	    statusbar(_("Spell checking failed: %s: %s"), spell_msg,
+ 		strerror(errno));
++      }
+     } else
+ 	statusbar(_("Finished checking spelling"));
+ }

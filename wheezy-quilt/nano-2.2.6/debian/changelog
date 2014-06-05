@@ -1,14 +1,8 @@
-nano (2.2.6-1ubuntu2letc1) trusty; urgency=medium
+nano (2.2.6-1letc1) unstable; urgency=low
 
-  * extended external-speller hook for crafted build suites
+  * Extended external-speller hook for crafted build suites
 
- -- Pauget Jean-Daniel <pauget@nekodune.com>  Sun, 18 May 2014 23:08:43 +0200
-
-nano (2.2.6-1ubuntu1) quantal; urgency=low
-
-  * Update config.guess,sub for aarch64
-
- -- Wookey <wookey@wookware.org>  Mon, 01 Oct 2012 12:57:07 +0100
+ -- Jean-Daniel Pauget <pauget@nekodune.com>  Wed, 28 May 2014 11:17:40 +0200
 
 nano (2.2.6-1) unstable; urgency=low
 

@@ -1,0 +1,149 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
+confflags= --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+else
+confflags= --build $(DEB_BUILD_GNU_TYPE)
+endif
+
+CFLAGS  = -Wall -g
+CFTINY  = -Wall -g -Os -fomit-frame-pointer
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+  CFLAGS += -O0
+else
+  CFLAGS += -O2
+endif
+
+nanobuild=$(CURDIR)/build-nano
+tinybuild=$(CURDIR)/build-tiny
+udebbuild=$(CURDIR)/build-udeb
+
+ARCH=$(shell dpkg --print-architecture)
+
+COMMON_CONFIG := --cache-file=$(CURDIR)/config.cache \
+			--prefix=/usr --mandir=\$${prefix}/share/man \
+			--infodir=\$${prefix}/share/info --srcdir='..' \
+			--sysconfdir=/etc $(confflags)
+
+build: build-stamp
+build-stamp: build-arch
+build-arch: build-nano-stamp build-tiny-stamp build-udeb-stamp
+
+build-nano-stamp: build-nano
+build-nano:
+	dh_testdir
+
+	[ -d $(nanobuild) ] || mkdir $(nanobuild)
+	cd $(nanobuild) && ../configure $(COMMON_CONFIG) \
+		--disable-wrapping-as-root && \
+		$(MAKE) CFLAGS="$(CFLAGS)"
+	touch build-nano-stamp
+
+build-tiny-stamp: build-tiny
+build-tiny:
+	dh_testdir
+
+	[ -d $(tinybuild) ] || mkdir $(tinybuild)
+	cd $(tinybuild) && ../configure $(COMMON_CONFIG) \
+		--enable-tiny --disable-speller --disable-justify \
+		--disable-tabcomp --disable-nls --disable-wrapping \
+		--with-slang &&  \
+		$(MAKE) CFLAGS="$(CFTINY)"
+	touch build-tiny-stamp
+
+build-udeb-stamp: build-udeb
+build-udeb:
+	dh_testdir
+
+	[ -d $(udebbuild) ] || mkdir $(udebbuild)
+	cd $(udebbuild) && ../configure $(COMMON_CONFIG) \
+		--enable-tiny --disable-speller --disable-justify \
+		--disable-tabcomp --disable-nls --disable-wrapping \
+		--with-slang &&  \
+		$(MAKE) CFLAGS="$(CFTINY)"
+	touch build-udeb-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -rf *-stamp
+
+	-rm -rf $(nanobuild) $(tinybuild) $(udebbuild)
+	-rm -f config.h
+	-rm -f intl/libintl.h config.cache
+#	-rm -f po/*.gmo
+
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+
+	cd $(nanobuild) && \
+		$(MAKE) install prefix=$(CURDIR)/debian/nano/usr \
+		  bindir=$(CURDIR)/debian/nano/bin
+
+	mkdir -p $(CURDIR)/debian/nano/usr/share/doc/nano/examples
+	cp $(nanobuild)/doc/nanorc.sample \
+	  $(CURDIR)/debian/nano/usr/share/doc/nano/examples
+
+	cp debian/nano-menu.xpm $(CURDIR)/debian/nano/usr/share/nano/
+	cp debian/nanorc $(CURDIR)/debian/nano/etc/nanorc
+	rm -rf $(CURDIR)/debian/nano/usr/share/nano/man-html
+	rm -rf $(CURDIR)/debian/nano/usr/share/man/fr
+
+	cd $(tinybuild) && \
+		$(MAKE) install prefix=$(CURDIR)/debian/nano-tiny/usr \
+		  bindir=$(CURDIR)/debian/nano-tiny/bin
+	mv debian/nano-tiny/bin/nano debian/nano-tiny/bin/nano-tiny
+	rm -rf $(CURDIR)/debian/nano-tiny/usr/share/man
+	rm -rf $(CURDIR)/debian/nano-tiny/usr/share/nano
+	rm -f $(CURDIR)/debian/nano-tiny/bin/rnano
+
+	cd $(udebbuild) && \
+		$(MAKE) install prefix=$(CURDIR)/debian/nano-udeb/usr \
+		bindir=$(CURDIR)/debian/nano-udeb/bin
+	rm -rf $(CURDIR)/debian/nano-udeb/usr
+	rm -f $(CURDIR)/debian/nano-udeb/bin/rnano
+
+binary-indep:
+
+binary-arch: build-arch install
+	dh_testdir
+	dh_testroot
+	dh_installdocs -a
+	dh_installexamples -a
+	dh_installmenu -a
+	dh_installman -a
+	dh_installinfo -pnano doc/texinfo/nano.info
+	rm -f debian/nano/usr/share/info/dir \
+		debian/nano/usr/share/info/dir.old
+	# We don't want info docs in -tiny
+	-rm -r debian/nano-tiny/usr/share/info
+	dh_installchangelogs ChangeLog -a
+	dh_link -a
+ifneq (,$(findstring hurd,$(DEB_HOST_ARCH_OS)))
+	rm -rf $(CURDIR)/debian/nano/usr/bin
+endif
+#	dh_desktop -a
+	dh_strip -a
+	dh_compress -a
+	dh_fixperms -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

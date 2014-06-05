@@ -1,57 +1,8 @@
-nano (2.2.6-1ubuntu2letc1) trusty; urgency=medium
+nano (2.2.2-1ubuntu2letc1lucid) lucid; urgency=medium
 
   * extended external-speller hook for crafted build suites
 
  -- Pauget Jean-Daniel <pauget@nekodune.com>  Sun, 18 May 2014 23:08:43 +0200
-
-nano (2.2.6-1ubuntu1) quantal; urgency=low
-
-  * Update config.guess,sub for aarch64
-
- -- Wookey <wookey@wookware.org>  Mon, 01 Oct 2012 12:57:07 +0100
-
-nano (2.2.6-1) unstable; urgency=low
-
-  * The "Què vol que li diga? Que vosté és una sinvergüensa?" release.
-  * New upstream release.
-  * Apply auto.patch from Tiago Silva (and DEP-3ified by Colin Watson)
-    to support C/C++ 'auto' storage class specifier (closes: #605403).
-
- -- Jordi Mallach <jordi@debian.org>  Mon, 30 Aug 2010 19:35:50 +0200
-
-nano (2.2.5-1) unstable; urgency=low
-
-  * The "Teulada" release.
-  * New upstream release.
-    - better behaviour when creating backup files on certain conditions.
-    - allow, via new command line option, to revert to old backup behaviour.
-  * Bump Standards-Version to 3.9.1 (no changes).
-  * Break, not Conflict, alpine-pico. Drop obsolete Conflicts from 2003.
-  * Rename nano-udeb's XC-Package-Type control field to Package-Type.
-    Bump dpkg-dev to 1.15.7.
-
- -- Jordi Mallach <jordi@debian.org>  Mon, 30 Aug 2010 18:05:29 +0200
-
-nano (2.2.4-1) unstable; urgency=low
-
-  * The "905€" release.
-  * New upstream release.
-    - fixes minor security issues: symlink attack (CVE-2010-1160)
-      and ownership of arbitrary files (CVE-2010-1161). Closes: #577817.
-
- -- Jordi Mallach <jordi@debian.org>  Thu, 15 Apr 2010 19:26:23 +0200
-
-nano (2.2.3-1) unstable; urgency=low
-
-  * The "Polop" release.
-  * New upstream release.
-  * Drop Build-Depends on groff; it was only needed to rebuild the
-    modified manpages.
-  * Nearly three years late, alpine-pico is finally playing the
-    update-alternatives game and can now coexist with nano. Update
-    our conflict accordingly. Thanks, Asheesh!
-
- -- Jordi Mallach <jordi@debian.org>  Fri, 12 Feb 2010 02:49:13 +0100
 
 nano (2.2.2-1) unstable; urgency=low
 
@@ -95,8 +46,8 @@ nano (2.1.99pre2-1) unstable; urgency=low
 
 nano (2.1.99pre1-1) unstable; urgency=low
 
-  * The "Ferraris" release.
   * New upstream prerelease.
+  * The "Ferraris" release.
   * Remove empty /usr/share/nano from nano-tiny.
   * Drop 10_browser_floating_point_exception.patch, obsolete.
 
@@ -202,16 +153,6 @@ nano (2.0.8-1) experimental; urgency=low
   * Rename debhelper configuration files to have the "nano." prefix.
 
  -- Jordi Mallach <jordi@debian.org>  Tue, 26 Aug 2008 18:35:35 +0200
-
-nano (2.0.7-5) stable; urgency=low
-
-  * The "No me preocupa nada, como Juan sin miedo, porque nada temo"
-    release.
-  * Backport two minor security fixes from upcoming 2.0.10 and 2.2.4:
-    - CVE-2010-1160: symlink attack.
-    - CVE-2010-1161: change of ownership of arbitrary files.
-
- -- Jordi Mallach <jordi@debian.org>  Mon, 26 Apr 2010 13:41:39 +0200
 
 nano (2.0.7-4) unstable; urgency=high
 

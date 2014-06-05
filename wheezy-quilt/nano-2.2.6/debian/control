@@ -1,0 +1,59 @@
+Source: nano
+Section: editors
+Priority: optional
+Maintainer: Jordi Mallach <jordi@debian.org>
+Uploaders: Steve Langasek <vorlon@debian.org>
+Build-Depends: dpkg-dev (>= 1.15.7), debhelper (>= 7), libncurses5-dev, libncursesw5-dev, libslang2-dev
+Standards-Version: 3.9.1
+Vcs-Svn: svn://svn.debian.org/svn/collab-maint/deb-maint/nano
+Vcs-Browser: http://svn.debian.org/viewsvn/collab-maint/deb-maint/nano/
+Homepage: http://www.nano-editor.org/
+
+Package: nano
+Architecture: any
+Priority: important
+Depends: ${shlibs:Depends}, dpkg (>= 1.15.4) | install-info, ${misc:Depends}
+Provides: editor
+Suggests: spell
+Conflicts: pico
+Breaks: alpine-pico (<= 2.00+dfsg-5)
+Replaces: pico
+Description: small, friendly text editor inspired by Pico
+ GNU nano is an easy-to-use text editor originally designed as a replacement
+ for Pico, the ncurses-based editor from the non-free mailer package Pine
+ (itself now available under the Apache License as Alpine).
+ .
+ However, nano also implements many features missing in pico, including:
+  - feature toggles;
+  - interactive search and replace (with regular expression support);
+  - go to line (and column) command;
+  - auto-indentation and color syntax-highlighting;
+  - filename tab-completion and support for multiple buffers;
+  - full internationalization support.
+
+Package: nano-tiny
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Provides: editor
+Description: small, friendly text editor inspired by Pico - tiny build
+ GNU nano is an easy-to-use text editor originally designed as a replacement
+ for Pico, the ncurses-based editor from the non-free mailer package Pine
+ (itself now available under the Apache License as Alpine).
+ .
+ This package contains a build of GNU nano with many features disabled, for
+ environments such as rescue disks where resources are limited.
+
+Package: nano-udeb
+Architecture: any
+Section: debian-installer
+Priority: standard
+Package-Type: udeb
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Provides: editor
+Description: small, friendly text editor inspired by Pico - udeb
+ GNU nano is an easy-to-use text editor originally designed as a replacement
+ for Pico, the ncurses-based editor from the non-free mailer package Pine
+ (itself now available under the Apache License as Alpine).
+ .
+ This package contains a build of GNU nano with many features disabled, for
+ use in debian-installer.
